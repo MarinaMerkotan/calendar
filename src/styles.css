@@ -1,0 +1,76 @@
+#root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  user-select: none;
+}
+
+.wrapper {
+  width: 430px;
+  background-color: #fcfcfc;
+  border-radius: 20px;
+  padding: 20px 30px;
+  font-weight: 600;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #a3a3a5;
+}
+
+.navigation-button {
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  border: 1px solid #f6f6f6;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.navigation-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.left-navigation-button svg {
+  transform: rotate(180deg);
+}
+
+.current-date {
+  font-size: 21px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.grid-item {
+  color: #1b1b1b;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  aspect-ratio: 1;
+}
+
+.day,
+.inactive-grid-item {
+  color: #b3b3b3;
+}
+
+.today-grid-item {
+  color: #4d6bf1;
+  border: 2px solid #4d6bf1;
+  border-radius: 10px;
+}
