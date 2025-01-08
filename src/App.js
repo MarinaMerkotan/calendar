@@ -60,10 +60,14 @@ function App() {
       if (selectedDays.length === 0 || selectedDays.length > 1) {
         unavailableDays.includes(item.day) ? showAlert(msg2) : setSelectedDays([item.day]);
       } else {
-        const min = Math.min(item.day, selectedDays[0]);
-        const max = Math.max(item.day, selectedDays[0]);
-        const inRange = unavailableDays.some((unavailable) => isInRange(unavailable, min, max));
-        inRange ? showAlert(msg1) : setSelectedDays(Array.from({ length: max - min + 1 }, (_, i) => i + min));
+        if (selectedDays[0] === item.day) {
+          setSelectedDays([]);
+        } else {
+          const min = Math.min(item.day, selectedDays[0]);
+          const max = Math.max(item.day, selectedDays[0]);
+          const inRange = unavailableDays.some((unavailable) => isInRange(unavailable, min, max));
+          inRange ? showAlert(msg1) : setSelectedDays(Array.from({ length: max - min + 1 }, (_, i) => i + min));
+        }
       }
     }
   };
