@@ -33,3 +33,5 @@ export const getAllDaysOfMonth = (year, month) => {
 
   return days;
 };
+
+export const isInRange = (num, min, max) => num >= min && num <= max;

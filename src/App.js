@@ -1,19 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Arrow from './Arrow';
-import { getAllDaysOfMonth, isToday } from './utils';
+import { getAllDaysOfMonth, isInRange, isToday } from './utils';
 import { daysOfWeek, monthNames } from './config';
 
 import './styles.css';
 
 const date = new Date();
 
+const unavailableDays = [4, 5, 17];
+
 function App() {
   const [currentMonth, setCurrentMonth] = useState(date.getMonth());
   const [currentYear, setCurrentYear] = useState(date.getFullYear());
+  const [days, setDays] = useState([]);
+  const [selectedDays, setSelectedDays] = useState([]);
+  const [alertMessage, setAlertMessage] = useState(null);
 
-  const days = getAllDaysOfMonth(currentYear, currentMonth);
+  useEffect(() => {
+    const daysOfTheMonth = getAllDaysOfMonth(currentYear, currentMonth).map((item) => ({
+      ...item,
+      selected: item.active && selectedDays.includes(item.day),
+      unavailable: unavailableDays.includes(item.day),
+    }));
+    setDays(daysOfTheMonth);
+  }, [currentYear, currentMonth, selectedDays]);
 
   const changeToPrevMonth = () => {
+    setSelectedDays([]);
     if (currentMonth === 0) {
       setCurrentYear((prev) => prev - 1);
       setCurrentMonth(11);
@@ -23,12 +36,42 @@ function App() {
   };
 
   const changeToNextMonth = () => {
+    setSelectedDays([]);
     if (currentMonth === 11) {
       setCurrentYear((prev) => prev + 1);
       setCurrentMonth(0);
     } else {
       setCurrentMonth((prev) => prev + 1);
     }
+  };
+
+  const selectDay = (item) => {
+    if (item.active) {
+      if (selectedDays.length === 0) {
+        setSelectedDays([item.day]);
+      } else if (selectedDays.length === 1) {
+        const min = Math.min(item.day, selectedDays[0]);
+        const max = Math.max(item.day, selectedDays[0]);
+        let inRange = false;
+        unavailableDays.forEach((unavailable) => {
+          inRange = isInRange(unavailable, min, max);
+        });
+        if (inRange) {
+          setAlertMessage('The selected range cannot be chosen due to the presence of unavailable days.');
+          setTimeout(() => {
+            setAlertMessage(null);
+          }, 3000);
+        } else {
+          setSelectedDays(Array.from({ length: max - min + 1 }, (_, i) => i + min));
+        }
+      } else {
+        setSelectedDays([item.day]);
+      }
+    }
+  };
+
+  const handleDone = () => {
+    setSelectedDays([]);
   };
 
   return (
@@ -50,17 +93,32 @@ function App() {
             {item}
           </div>
         ))}
-        {days.map((item, index) => (
-          <div
-            key={index}
-            className={`grid-item${item.active ? '' : ' inactive-grid-item'}${
-              item.active && isToday(currentYear, currentMonth, item.day) ? ' today-grid-item' : ''
-            }`}
-          >
-            {item.day}
-          </div>
-        ))}
+        {days.map((item, index) => {
+          const classNames = [
+            'grid-item',
+            !item.active && 'inactive-item',
+            item.selected && 'selected-item',
+            item.active && item.unavailable && 'unavailable-item',
+            item.selected && item.day === selectedDays[0] && 'first-selected',
+            item.selected && item.day === selectedDays.at(-1) && 'last-selected',
+            item.active && !item.selected && isToday(currentYear, currentMonth, item.day) && 'today-item',
+          ]
+            .filter(Boolean)
+            .join(' ');
+
+          return (
+            <div key={index} className={classNames} onClick={() => selectDay(item)}>
+              {item.day}
+            </div>
+          );
+        })}
       </div>
+      <div className='footer'>
+        <button className='done-button' onClick={handleDone}>
+          Done
+        </button>
+      </div>
+      {alertMessage && <div className='alert'>{alertMessage}</div>}
     </div>
   );
 }
